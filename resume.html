@@ -536,12 +536,25 @@ toggle.addEventListener('change', () => {
   tgLabel.textContent = toggle.checked ? 'Dark' : 'Light';
 });
 
-// Download current PDF
-document.getElementById('dlBtn').addEventListener('click', () => {
-  const a = document.createElement('a');
-  a.href = toggle.checked ? DARK_PDF : LIGHT_PDF;
-  a.download = 'Arman_Hossen_Ripon_Resume.pdf';
-  a.click();
+// Download current PDF — fetch as blob so filename is always respected
+document.getElementById('dlBtn').addEventListener('click', async () => {
+  const src = toggle.checked ? DARK_PDF : LIGHT_PDF;
+  try {
+    const res  = await fetch(src);
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'Arman_Hossen_Ripon_Resume.pdf';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  } catch {
+    // fallback if fetch fails
+    const a    = document.createElement('a');
+    a.href     = src;
+    a.download = 'Arman_Hossen_Ripon_Resume.pdf';
+    a.click();
+  }
 });
 
 // Init
